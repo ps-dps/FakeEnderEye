@@ -1,0 +1,27 @@
+name: FakeEnderEye
+author: PuckiSilver
+version: v2.0.0
+output: build
+require:
+  - bolt
+
+data_pack:
+  load:
+    - libs/lantern-load.zip
+    - src
+  name: FakeEnderEye
+  description: Mimic the vanilla ender eye behavior, allowing for click detection in survival
+  filter:
+    block:
+      - namespace: minecraft
+        path: tags/worldgen/structure/eye_of_ender_located.json
+
+pipeline:
+  - mecha
+  - beet.contrib.minify_json
+  - plugins.credit
+  - plugins.credit_dom
+meta:
+  bolt:
+    entrypoint: fee:main
+  credit: [fee]

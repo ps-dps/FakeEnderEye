@@ -1,0 +1,91 @@
+
+from ./particles import circle
+
+append function_tag load:load {"values":["fee:load"]}
+function fee:load:
+    scoreboard objectives add fee dummy
+    scoreboard players set #2 fee 2
+
+advancement fee:throw_eye {
+    "criteria": {
+        "mainhand": { "trigger": "minecraft:using_item", "conditions": {
+            "item": { "items": [ "minecraft:ender_eye" ]},
+            "player": [
+            { "condition": "minecraft:value_check",
+                "value": { "type": "minecraft:score", "target": { "type": "minecraft:fixed", "name": ".gametime" }, "score": "fee" }, "range": {
+                "min": { "type": "minecraft:score", "target": "this", "score": "fee" },
+                "max": 2147483647 }},
+            { "condition": "minecraft:entity_properties", "entity": "this", "predicate": {
+                "equipment": { "mainhand": { "items": [ "minecraft:ender_eye" ]}}}},
+            { "condition": "minecraft:inverted", "term": {
+                "condition": "minecraft:entity_properties", "entity": "this", "predicate": {
+                    "equipment": { "mainhand": { "nbt": "{}" }}}}}]
+        }},
+        "offhand": { "trigger": "minecraft:using_item", "conditions": {
+            "item": { "items": [ "minecraft:ender_eye" ]},
+            "player": [
+            { "condition": "minecraft:value_check",
+                "value": { "type": "minecraft:score", "target": { "type": "minecraft:fixed", "name": ".gametime" }, "score": "fee" }, "range": {
+                "min": { "type": "minecraft:score", "target": "this", "score": "fee" },
+                "max": 2147483647 }},
+            { "condition": "minecraft:entity_properties", "entity": "this", "predicate": {
+                "equipment": { "offhand": { "items": [ "minecraft:ender_eye" ]}}}},
+            { "condition": "minecraft:inverted", "term": {
+                "condition": "minecraft:entity_properties", "entity": "this", "predicate": {
+                    "equipment": { "mainhand": { "items": [ "minecraft:ender_eye" ]}}}}},
+            { "condition": "minecraft:inverted", "term": {
+                "condition": "minecraft:entity_properties", "entity": "this", "predicate": {
+                    "equipment": { "offhand": { "nbt": "{}" }}}}}]
+        }}
+    },
+    "requirements": [[ "mainhand", "offhand" ]],
+    "rewards": { "function": "fee:throw_eye" }}
+function fee:throw_eye:
+    execute anchored eyes positioned ^ ^ ^ summon snowball function fee:setup/snowball
+    if entity @s[advancements={fee:throw_eye={mainhand=true}},gamemode=!creative] item modify entity @s weapon.mainhand fee:remove_one
+    if entity @s[advancements={fee:throw_eye={offhand=true}},gamemode=!creative] item modify entity @s weapon.offhand fee:remove_one
+    playsound minecraft:entity.ender_eye.launch neutral @a ~ ~ ~ 0.5 0.42
+    advancement revoke @s only fee:throw_eye
+    store result score @s fee schedule function fee:refresh_gametime 4t append:
+        store result score .gametime fee time query gametime
+
+function fee:setup/snowball:
+    data modify entity @s NoGravity set value 1b
+    data modify entity @s Item set value {id:"minecraft:ender_eye",Count:1b}
+    function fee:locate
+    store result entity @s Pos[0] double 1 scoreboard players operation #location_x fee /= #denominator fee
+    store result entity @s Pos[2] double 1 scoreboard players operation #location_z fee /= #denominator fee
+    positioned 0 ~ 0 facing entity @s feet run tp @s ^ ^ ^10
+    store result entity @s Motion[0] double 0.028 run data get entity @s Pos[0]
+    store result entity @s Motion[2] double 0.028 run data get entity @s Pos[2]
+    tp @s ~ ~ ~
+    data modify entity @s Motion[1] set value 0.16d
+    tag @s add fee.snowball
+    execute summon marker function fee:setup/marker:
+        ride @s mount @e[type=snowball,tag=fee.snowball,dx=0,limit=1]
+        tag @s add fee.marker
+        store result score @s fee schedule function fee:clean_up/ 81t append
+
+function fee:clean_up/:
+    store result score .gametime fee time query gametime
+    as @e[type=marker,tag=fee.marker] if score @s fee <= .gametime fee at @s function fee:clean_up/marker:
+        scoreboard players set .should_drop fee 0
+        if predicate fee:should_drop scoreboard players set .should_drop fee 1
+        if score .should_drop fee matches 1 function fee:clean_up/drop:
+            summon item ~ ~ ~ {Item:{"id":"minecraft:ender_eye",Count:1b}}
+        if score .should_drop fee matches 0 function fee:clean_up/dont_drop:
+            circle(2, 20, "reverse_portal", "in", 1, mode="normal")
+            particle item ender_eye ~ ~ ~ 0.2 0.2 0.2 0.1 5
+        particle minecraft:portal ~ ~ ~ 0.2 0.2 0.2 0 20
+        playsound minecraft:entity.ender_eye.death neutral @a
+        on vehicle kill @s
+        kill @s
+
+item_modifier fee:remove_one {
+    "function": "minecraft:set_count",
+    "count": -1,
+    "add": true }
+
+predicate fee:should_drop {
+    "condition": "minecraft:random_chance",
+    "chance": 0.8 }
