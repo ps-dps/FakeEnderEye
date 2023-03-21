@@ -9,7 +9,7 @@ Any ender eye that **doesn't have nbt** can be thrown like a vanilla ender eye
 To locate the stronghold, the pack uses **triangulation**, making it efficient
 
 ## **How do I use it in MY Pack**
-Download the [latest release](github.com/ps-dps/FakeEnderEye/releases/latest) from the releases tab
+Download the [latest release](https://github.com/ps-dps/FakeEnderEye/releases/latest) from the releases tab
 
 Copy the `fee` namespace into your data pack and make sure that the function `fee:load` runs on reload.
 
