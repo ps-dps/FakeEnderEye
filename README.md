@@ -9,9 +9,13 @@ Any ender eye that **doesn't have nbt** can be thrown like a vanilla ender eye
 To locate the stronghold, the pack uses **triangulation**, making it efficient
 
 ## **How do I use it in MY Pack**
-Simply copy the `fee` namespace into your data pack and make sure that the function `fee:load` runs on reload.
+Download the [latest release](github.com/ps-dps/FakeEnderEye/releases/latest) from the releases tab
+
+Copy the `fee` namespace into your data pack and make sure that the function `fee:load` runs on reload.
 
 You also need to copy the `filter` part of the `pack.mcmeta` into your own `pack.mcmeta`<br>**or** replace the worldgen structure tag `eye_of_ender_located` with an empty one (making sure to include `"replace": true`)
+
+The data pack can also be used standalone or as an **external dependency**, but I **recommend packaging** it in your own data pack as described above
 
 ## **Known Issues**
 When **renaming** a vanilla ender eye, it becomes unusable since it now has nbt tags
