@@ -64,9 +64,9 @@ function fee:setup/snowball:
     execute summon marker function fee:setup/marker:
         ride @s mount @e[type=snowball,tag=fee.snowball,dx=0,limit=1]
         tag @s add fee.marker
-        store result score @s fee schedule function fee:clean_up/ 81t append
+        store result score @s fee schedule function fee:clean_up/init 81t append
 
-function fee:clean_up/:
+function fee:clean_up/init:
     store result score .gametime fee time query gametime
     as @e[type=marker,tag=fee.marker] if score @s fee <= .gametime fee at @s function fee:clean_up/marker:
         scoreboard players set .should_drop fee 0
